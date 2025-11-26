@@ -58,29 +58,26 @@ jobs:
           echo "WEB_IMAGE_URL=$ECR_REGISTRY/${{ env.ECR_WEB_REPOSITORY }}:$IMAGE_TAG" >> $GITHUB_ENV
 
       - name: Send Web deploy success to Discord
-        if: success() && secrets.DISCORD_WEBHOOK != ''
-        uses: sarisia/actions-status-discord@v1
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          title: "Web App ECR Deploy Success"
-          description: |
-            **Branch:** ${{ github.ref_name }}
-            **Commit:** ${{ github.sha }}
-            **Image:** `${{ env.WEB_IMAGE_URL }}`
-          color: 0x00ff00
-          username: GitHub Actions
+        if: ${{ success() }}
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          if [ -n "$DISCORD_WEBHOOK" ]; then
+            curl -H "Content-Type: application/json" \
+              -d "{\"username\":\"GitHub Actions\",\"embeds\":[{\"title\":\"Web App ECR Deploy Success\",\"description\":\"**Branch:** ${{ github.ref_name }}\n**Commit:** ${{ github.sha }}\n**Image:** \`${{ env.WEB_IMAGE_URL }}\`\",\"color\":65280}]}" \
+              "$DISCORD_WEBHOOK"
+          fi
 
       - name: Send Web deploy failure to Discord
-        if: failure() && secrets.DISCORD_WEBHOOK != ''
-        uses: sarisia/actions-status-discord@v1
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          title: "Web App ECR Deploy Failed"
-          description: |
-            **Branch:** ${{ github.ref_name }}
-            **Commit:** ${{ github.sha }}
-          color: 0xff0000
-          username: GitHub Actions
+        if: ${{ failure() }}
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          if [ -n "$DISCORD_WEBHOOK" ]; then
+            curl -H "Content-Type: application/json" \
+              -d "{\"username\":\"GitHub Actions\",\"embeds\":[{\"title\":\"Web App ECR Deploy Failed\",\"description\":\"**Branch:** ${{ github.ref_name }}\n**Commit:** ${{ github.sha }}\",\"color\":16711680}]}" \
+              "$DISCORD_WEBHOOK"
+          fi
 
   build-and-push-admin:
     name: Build and Push Admin App to ECR
@@ -124,26 +121,23 @@ jobs:
           echo "ADMIN_IMAGE_URL=$ECR_REGISTRY/${{ env.ECR_ADMIN_REPOSITORY }}:$IMAGE_TAG" >> $GITHUB_ENV
 
       - name: Send Admin deploy success to Discord
-        if: success() && secrets.DISCORD_WEBHOOK != ''
-        uses: sarisia/actions-status-discord@v1
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          title: "Admin App ECR Deploy Success"
-          description: |
-            **Branch:** ${{ github.ref_name }}
-            **Commit:** ${{ github.sha }}
-            **Image:** `${{ env.ADMIN_IMAGE_URL }}`
-          color: 0x00ff00
-          username: GitHub Actions
+        if: ${{ success() }}
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          if [ -n "$DISCORD_WEBHOOK" ]; then
+            curl -H "Content-Type: application/json" \
+              -d "{\"username\":\"GitHub Actions\",\"embeds\":[{\"title\":\"Admin App ECR Deploy Success\",\"description\":\"**Branch:** ${{ github.ref_name }}\n**Commit:** ${{ github.sha }}\n**Image:** \`${{ env.ADMIN_IMAGE_URL }}\`\",\"color\":65280}]}" \
+              "$DISCORD_WEBHOOK"
+          fi
 
       - name: Send Admin deploy failure to Discord
-        if: failure() && secrets.DISCORD_WEBHOOK != ''
-        uses: sarisia/actions-status-discord@v1
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          title: "Admin App ECR Deploy Failed"
-          description: |
-            **Branch:** ${{ github.ref_name }}
-            **Commit:** ${{ github.sha }}
-          color: 0xff0000
-          username: GitHub Actions
+        if: ${{ failure() }}
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          if [ -n "$DISCORD_WEBHOOK" ]; then
+            curl -H "Content-Type: application/json" \
+              -d "{\"username\":\"GitHub Actions\",\"embeds\":[{\"title\":\"Admin App ECR Deploy Failed\",\"description\":\"**Branch:** ${{ github.ref_name }}\n**Commit:** ${{ github.sha }}\",\"color\":16711680}]}" \
+              "$DISCORD_WEBHOOK"
+          fi
